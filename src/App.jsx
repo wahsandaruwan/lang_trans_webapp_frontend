@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import {TypingGuide} from "./components"
 
 const App = () => {
   const [englishText, setEnglishText] = useState('');
@@ -164,10 +165,9 @@ const App = () => {
 
   // Demo examples to show common usage
   const examples = [
-    { english: "t", sinhala: "ත්" },
     { english: "sinhala", sinhala: "සිංහල" },
     { english: "sin\\hala", sinhala: "සිංහල" },
-    { english: "mama oyaata aadarei", sinhala: "මම ඔයාට ආදරෙයි" },
+    { english: "mama oyaatta aadareyi", sinhala: "මම ඔයාට ආදරෙයි" },
     { english: "sri lanka", sinhala: "ශ්‍රී ලංකා" }
   ];
 
@@ -244,92 +244,7 @@ const App = () => {
           </div>
         </div>
         
-        {showMapping && (
-          <div className="mt-6 border-t pt-4">
-            <h2 className="text-xl font-semibold mb-3">Typing Guide</h2>
-            
-            <h3 className="font-medium mt-4 mb-2">Dental Consonants:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>t</span>
-                <span className="font-semibold">ත්</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ta</span>
-                <span className="font-semibold">ත</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>th</span>
-                <span className="font-semibold">ථ්</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>tha</span>
-                <span className="font-semibold">ථ</span>
-              </div>
-            </div>
-
-            <h3 className="font-medium mt-4 mb-2">Retroflex Consonants:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>tt</span>
-                <span className="font-semibold">ට්</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>tta</span>
-                <span className="font-semibold">ට</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>tth</span>
-                <span className="font-semibold">ඨ්</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ttha</span>
-                <span className="font-semibold">ඨ</span>
-              </div>
-            </div>
-            
-            <h3 className="font-medium mt-4 mb-2">Special Characters:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>n\</span>
-                <span className="font-semibold">ං (anusvara)</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>N</span>
-                <span className="font-semibold">ං (alternative)</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>H</span>
-                <span className="font-semibold">ඃ (visarga)</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>sri</span>
-                <span className="font-semibold">ශ්‍රී</span>
-              </div>
-            </div>
-            
-            <h3 className="font-medium mt-4 mb-2">Type "සිංහල" (Sinhala) as:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>sin\hala</span>
-                <span className="font-semibold">සිංහල</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>siNhala</span>
-                <span className="font-semibold">සිංහල</span>
-              </div>
-            </div>
-            
-            <p className="mt-4 text-sm text-gray-600">
-              This transliteration system distinguishes between dental and retroflex consonants:
-              <br />- Dental: "t" → "ත්", "th" → "ථ්"
-              <br />- Retroflex: "tt" → "ට්", "tth" → "ඨ්"
-              <br />
-              <br />For typing the "anusvara" (ං) sound that appears in "සිංහල", you can use either "n\" or "N" 
-              after a vowel or consonant. For example, "sin\hala" or "siNhala" will both produce "සිංහල".
-            </p>
-          </div>
-        )}
+        {showMapping && <TypingGuide/>}
       </div>
     </div>
   );
