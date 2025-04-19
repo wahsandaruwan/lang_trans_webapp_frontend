@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const App = () => {
   const [englishText, setEnglishText] = useState('');
   const [sinhalaText, setSinhalaText] = useState('');
   const [showMapping, setShowMapping] = useState(false);
 
-  // Define consonant base characters
+  // Define consonant base characters with corrected mappings
   const consonants = {
     'k': 'ක', 'kh': 'ඛ', 'g': 'ග', 'gh': 'ඝ', 'ng': 'ඞ',
     'ch': 'ච', 'chh': 'ඡ', 'j': 'ජ', 'jh': 'ඣ', 'nj': 'ඤ',
-    't': 'ට', 'th': 'ඨ', 'd': 'ඩ', 'dh': 'ඪ', 'n': 'න',
-    'nd': 'ඳ', 'tha': 'ත', 'thha': 'ථ', 'da': 'ද', 'dha': 'ධ',
-    'na': 'න', 'p': 'ප', 'ph': 'ඵ', 'b': 'බ', 'bh': 'භ',
+    'tt': 'ට', 'tth': 'ඨ', 'dd': 'ඩ', 'ddh': 'ඪ', 'nn': 'ණ',
+    'nnd': 'ඳ', 'th': 'ත', 'thh': 'ථ', 'd': 'ද', 'dh': 'ධ',
+    'n': 'න', 'p': 'ප', 'ph': 'ඵ', 'b': 'බ', 'bh': 'භ',
     'm': 'ම', 'mb': 'ඹ', 'y': 'ය', 'r': 'ර', 'l': 'ල',
-    'v': 'ව', 'sh': 'ශ', 'sha': 'ෂ', 's': 'ස', 'h': 'හ',
-    'f': 'ෆ', 'gn': 'ඥ', 'gna': 'ඥ', 'lu': 'ළු'
+    'v': 'ව', 'sh': 'ශ', 'shh': 'ෂ', 's': 'ස', 'h': 'හ',
+    'f': 'ෆ', 'gn': 'ඥ', 'L': 'ළ'
   };
 
   // Define vowel modifiers
@@ -55,7 +55,20 @@ const App = () => {
   // Special characters and additional mappings
   const specialChars = {
     '.': '.', ',': ',', '?': '?', '!': '!',
-    ' ': ' ', '\n': '\n', '\t': '\t'
+    ' ': ' ', '\n': '\n', '\t': '\t',
+    // Add the anusvara (binduva) and other special characters
+    'n\\': 'ං', // anusvara using n\
+    'N': 'ං',   // alternative for anusvara
+    'ng\\': 'ඃ', // visarga
+    'H': 'ඃ',   // alternative for visarga
+    'R': 'ඍ',   // special vowels
+    'Ru': 'ඎ',
+    'Lu': 'ඏ', 
+    'Luu': 'ඐ',
+    'ru': 'ෘ',   // vowel modifiers
+    'ruu': 'ෲ',
+    'lu': 'ෟ',
+    'luu': 'ෳ'
   };
 
   // Generate all consonant-vowel combinations dynamically
@@ -74,12 +87,24 @@ const App = () => {
           map[engConsonant + engVowel] = sinhalaConsonant + sinhalaVowelMod;
         }
       });
+      
+      // Add consonant + anusvara combinations
+      map[engConsonant + 'n\\'] = sinhalaConsonant + 'ං';
+      map[engConsonant + 'N'] = sinhalaConsonant + 'ං';
     });
     
     return map;
   };
 
   const sinhalaMap = generateSinhalaMap();
+
+  // Add some common word combinations for easier typing
+  const wordCombinations = {
+    'sinhala': 'සිංහල',
+    'sinhalese': 'සිංහල',
+    'lanka': 'ලංකා',
+    'sri': 'ශ්‍රී'
+  };
 
   // Function to transliterate English to Sinhala
   const transliterate = (text) => {
@@ -88,6 +113,26 @@ const App = () => {
     
     while (i < text.length) {
       let found = false;
+      
+      // Check for word combinations first
+      for (const [engWord, sinhalaWord] of Object.entries(wordCombinations)) {
+        if (text.substr(i).toLowerCase().startsWith(engWord.toLowerCase())) {
+          // Check if the word is a full word (surrounded by spaces or at the beginning/end)
+          const isFullWord = (
+            (i === 0 || /\s/.test(text[i - 1])) && 
+            (i + engWord.length === text.length || /\s/.test(text[i + engWord.length]))
+          );
+          
+          if (isFullWord) {
+            result += sinhalaWord;
+            i += engWord.length;
+            found = true;
+            break;
+          }
+        }
+      }
+      
+      if (found) continue;
       
       // Try to match longest patterns first (up to 5 characters)
       for (let length = 5; length > 0; length--) {
@@ -119,9 +164,11 @@ const App = () => {
 
   // Demo examples to show common usage
   const examples = [
+    { english: "t", sinhala: "ත්" },
+    { english: "sinhala", sinhala: "සිංහල" },
+    { english: "sin\\hala", sinhala: "සිංහල" },
     { english: "mama oyaata aadarei", sinhala: "මම ඔයාට ආදරෙයි" },
-    { english: "kohomada ithin", sinhala: "කොහොමද ඉතින්" },
-    { english: "ayubowan subha dawasak", sinhala: "ආයුබෝවන් සුභ දවසක්" }
+    { english: "sri lanka", sinhala: "ශ්‍රී ලංකා" }
   ];
 
   // Apply an example
@@ -201,75 +248,91 @@ const App = () => {
           <div className="mt-6 border-t pt-4">
             <h2 className="text-xl font-semibold mb-3">Typing Guide</h2>
             
-            <h3 className="font-medium mt-4 mb-2">Vowels:</h3>
+            <h3 className="font-medium mt-4 mb-2">Dental Consonants:</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-              {Object.entries(vowels).map(([eng, sin], idx) => (
-                <div key={idx} className="bg-gray-50 p-2 rounded flex justify-between">
-                  <span>{eng}</span>
-                  <span className="font-semibold">{sin}</span>
-                </div>
-              ))}
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>t</span>
+                <span className="font-semibold">ත්</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>ta</span>
+                <span className="font-semibold">ත</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>th</span>
+                <span className="font-semibold">ථ්</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>tha</span>
+                <span className="font-semibold">ථ</span>
+              </div>
+            </div>
+
+            <h3 className="font-medium mt-4 mb-2">Retroflex Consonants:</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>tt</span>
+                <span className="font-semibold">ට්</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>tta</span>
+                <span className="font-semibold">ට</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>tth</span>
+                <span className="font-semibold">ඨ්</span>
+              </div>
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>ttha</span>
+                <span className="font-semibold">ඨ</span>
+              </div>
             </div>
             
-            <h3 className="font-medium mt-4 mb-2">Some consonants with vowel modifiers:</h3>
+            <h3 className="font-medium mt-4 mb-2">Special Characters:</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
               <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>k</span>
-                <span className="font-semibold">ක්</span>
+                <span>n\</span>
+                <span className="font-semibold">ං (anusvara)</span>
               </div>
               <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ka</span>
-                <span className="font-semibold">ක</span>
+                <span>N</span>
+                <span className="font-semibold">ං (alternative)</span>
               </div>
               <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ki</span>
-                <span className="font-semibold">කි</span>
+                <span>H</span>
+                <span className="font-semibold">ඃ (visarga)</span>
               </div>
               <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>kii</span>
-                <span className="font-semibold">කී</span>
+                <span>sri</span>
+                <span className="font-semibold">ශ්‍රී</span>
+              </div>
+            </div>
+            
+            <h3 className="font-medium mt-4 mb-2">Type "සිංහල" (Sinhala) as:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <div className="bg-gray-50 p-2 rounded flex justify-between">
+                <span>sin\hala</span>
+                <span className="font-semibold">සිංහල</span>
               </div>
               <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ku</span>
-                <span className="font-semibold">කු</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>kuu</span>
-                <span className="font-semibold">කූ</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ke</span>
-                <span className="font-semibold">කෙ</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>kee</span>
-                <span className="font-semibold">කේ</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>ko</span>
-                <span className="font-semibold">කො</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>koo</span>
-                <span className="font-semibold">කෝ</span>
-              </div>
-              <div className="bg-gray-50 p-2 rounded flex justify-between">
-                <span>kau</span>
-                <span className="font-semibold">කෞ</span>
+                <span>siNhala</span>
+                <span className="font-semibold">සිංහල</span>
               </div>
             </div>
             
             <p className="mt-4 text-sm text-gray-600">
-              This mapping follows common transliteration patterns. For vowels, double letters often
-              indicate long vowels (e.g., "aa" for "ආ", "ii" for "ඊ"). For consonants, add vowel sounds
-              after the consonant (e.g., "ka" for "ක", "ki" for "කි"). To get the pure consonant with "hal" mark, 
-              just type the consonant letter (e.g., "k" for "ක්").
+              This transliteration system distinguishes between dental and retroflex consonants:
+              <br />- Dental: "t" → "ත්", "th" → "ථ්"
+              <br />- Retroflex: "tt" → "ට්", "tth" → "ඨ්"
+              <br />
+              <br />For typing the "anusvara" (ං) sound that appears in "සිංහල", you can use either "n\" or "N" 
+              after a vowel or consonant. For example, "sin\hala" or "siNhala" will both produce "සිංහල".
             </p>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
 
-export default App
+export default App;
